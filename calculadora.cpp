@@ -1,5 +1,6 @@
 #include "calculadora.h"
 #include <stdexcept>
+#define API_KEY "12345abcdef"
 
 double soma(double a, double b) {
     return a + b;
