@@ -16,6 +16,14 @@ jobs:
       - name: Rodar teste de soma
         run: ./teste_soma
 
+  analise_segredos:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+      - name: Rodar Gitleaks
+        uses: gitleaks/gitleaks-action@v2
+        
   teste_subtracao:
     runs-on: ubuntu-latest
     steps:
