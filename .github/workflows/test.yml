@@ -1,0 +1,56 @@
+name: Testes da Calculadora
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  teste_soma:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+      - name: Compilar
+        run: g++ -std=c++17 -o teste_calculadora teste_calculadora.cpp calculadora.cpp
+      - name: Rodar teste de soma
+        run: ./teste_calculadora soma
+
+  teste_subtracao:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+      - name: Compilar
+        run: g++ -std=c++17 -o teste_calculadora teste_calculadora.cpp calculadora.cpp
+      - name: Rodar teste de subtração
+        run: ./teste_calculadora subtracao
+
+  teste_multiplicacao:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+      - name: Compilar
+        run: g++ -std=c++17 -o teste_calculadora teste_calculadora.cpp calculadora.cpp
+      - name: Rodar teste de multiplicação
+        run: ./teste_calculadora multiplicacao
+
+  teste_divisao:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+      - name: Compilar
+        run: g++ -std=c++17 -o teste_calculadora teste_calculadora.cpp calculadora.cpp
+      - name: Rodar teste de divisão
+        run: ./teste_calculadora divisao
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: [teste_soma, teste_subtracao, teste_multiplicacao, teste_divisao]
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+      - name: Deploy
+        run: echo "Todos os 4 testes passaram"
