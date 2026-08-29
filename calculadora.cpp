@@ -19,5 +19,3 @@ double divisao(double a, double b) {
     }
     return a / b;
 }
-
-#endif
