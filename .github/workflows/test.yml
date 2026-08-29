@@ -49,6 +49,8 @@ jobs:
   cobertura:
     runs-on: ubuntu-latest
     needs: [teste_soma, teste_subtracao, teste_multiplicacao, teste_divisao]
+    outputs:
+      coverage: ${{ steps.verificar_cobertura.outputs.coverage }}
     steps:
       - name: Checkout do código
         uses: actions/checkout@v4
@@ -81,13 +83,17 @@ jobs:
       - name: Gerar relatório HTML
         run: genhtml coverage_calculadora.info --output-directory coverage_html
 
-      - name: Verificar percentual mínimo de cobertura (80%)
+      - name: Calcular percentual de cobertura
+        id: verificar_cobertura
         run: |
           COVERAGE=$(lcov --summary coverage_calculadora.info | grep "lines" | grep -oP '\d+\.\d+(?=%)')
           echo "Cobertura atual: $COVERAGE%"
+          echo "coverage=$COVERAGE" >> "$GITHUB_OUTPUT"
+
           if (( $(echo "$COVERAGE < 80" | bc -l) )); then
-            echo "Cobertura abaixo do mínimo exigido de 80%"
-            exit 1
+            echo "::warning::Cobertura de $COVERAGE% de 80%. O deploy sera bloqueado."
+          else
+            echo "Cobertura de $COVERAGE% atinge o minimo de 80%."
           fi
 
       - name: Upload do relatório de cobertura
@@ -99,8 +105,9 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     needs: [teste_soma, teste_subtracao, teste_multiplicacao, teste_divisao, cobertura]
+    if: ${{ fromJSON(needs.cobertura.outputs.coverage) >= 80 }}
     steps:
       - name: Checkout do código
         uses: actions/checkout@v4
       - name: Deploy
-        run: echo "Testes e coberturas passaram, fazendo deploy"
+        run: echo "Testes e cobertura (${{ needs.cobertura.outputs.coverage }}%) passaram, fazendo deploy"
