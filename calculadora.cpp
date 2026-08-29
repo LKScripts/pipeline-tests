@@ -6,7 +6,7 @@ double soma(double a, double b) {
 }
 
 double subtracao(double a, double b) {
-    return a + b; // de propósito para teste de cobertura de código
+    return a - b; // de propósito para teste de cobertura de código
 }
 
 double multiplicacao(double a, double b) {
