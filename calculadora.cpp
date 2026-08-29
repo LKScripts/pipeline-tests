@@ -6,7 +6,7 @@ double soma(double a, double b) {
 }
 
 double subtracao(double a, double b) {
-    return a - b;
+    return a + b; // de propósito para teste de cobertura de código
 }
 
 double multiplicacao(double a, double b) {
@@ -19,3 +19,11 @@ double divisao(double a, double b) {
     }
     return a / b;
 }
+
+double potencia(double base, int expoente) {
+    double resultado = 1;
+    for (int i = 0; i < expoente; i++) {
+        resultado *= base;
+    }
+    return resultado;
+} // não existe potencia, feito para fins de testes
