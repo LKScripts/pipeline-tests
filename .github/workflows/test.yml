@@ -96,11 +96,11 @@ jobs:
           name: relatorio-cobertura
           path: coverage_html
 
-  deploy:
+    deploy:
     runs-on: ubuntu-latest
-    needs: [teste_soma, teste_subtracao, teste_multiplicacao, teste_divisao]
+    needs: [teste_soma, teste_subtracao, teste_multiplicacao, teste_divisao, cobertura, analise_estatica, analise_seguranca]
     steps:
       - name: Checkout do código
         uses: actions/checkout@v4
       - name: Deploy
-        run: echo "Todos os 4 testes passaram. Rodando deploy"
+        run: echo "Testes e coberturas passaram, fazendo deploy"
