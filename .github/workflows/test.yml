@@ -11,40 +11,40 @@ jobs:
     steps:
       - name: Checkout do código
         uses: actions/checkout@v4
-      - name: Compilar
-        run: g++ -std=c++17 -o teste_calculadora teste_calculadora.cpp calculadora.cpp
+      - name: Compilar teste de soma
+        run: g++ -std=c++17 -o teste_soma teste_soma.cpp calculadora.cpp
       - name: Rodar teste de soma
-        run: ./teste_calculadora soma
+        run: ./teste_soma
 
   teste_subtracao:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout do código
         uses: actions/checkout@v4
-      - name: Compilar
-        run: g++ -std=c++17 -o teste_calculadora teste_calculadora.cpp calculadora.cpp
+      - name: Compilar teste de subtração
+        run: g++ -std=c++17 -o teste_subtracao teste_subtracao.cpp calculadora.cpp
       - name: Rodar teste de subtração
-        run: ./teste_calculadora subtracao
+        run: ./teste_subtracao
 
   teste_multiplicacao:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout do código
         uses: actions/checkout@v4
-      - name: Compilar
-        run: g++ -std=c++17 -o teste_calculadora teste_calculadora.cpp calculadora.cpp
+      - name: Compilar teste de multiplicação
+        run: g++ -std=c++17 -o teste_multiplicacao teste_multiplicacao.cpp calculadora.cpp
       - name: Rodar teste de multiplicação
-        run: ./teste_calculadora multiplicacao
+        run: ./teste_multiplicacao
 
   teste_divisao:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout do código
         uses: actions/checkout@v4
-      - name: Compilar
-        run: g++ -std=c++17 -o teste_calculadora teste_calculadora.cpp calculadora.cpp
+      - name: Compilar teste de divisão
+        run: g++ -std=c++17 -o teste_divisao teste_divisao.cpp calculadora.cpp
       - name: Rodar teste de divisão
-        run: ./teste_calculadora divisao
+        run: ./teste_divisao
 
   deploy:
     runs-on: ubuntu-latest
@@ -53,4 +53,4 @@ jobs:
       - name: Checkout do código
         uses: actions/checkout@v4
       - name: Deploy
-        run: echo "Todos os 4 testes passaram"
+        run: echo "Todos os 4 testes passaram. Rodando deploy"
