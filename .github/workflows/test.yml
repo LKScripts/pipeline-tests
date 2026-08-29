@@ -46,6 +46,56 @@ jobs:
       - name: Rodar teste de divisão
         run: ./teste_divisao
 
+  cobertura:
+    runs-on: ubuntu-latest
+    needs: [teste_soma, teste_subtracao, teste_multiplicacao, teste_divisao]
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+
+      - name: Instalar lcov e bc
+        run: sudo apt-get update && sudo apt-get install -y lcov bc
+
+      - name: Compilar calculadora com cobertura
+        run: g++ -std=c++17 --coverage -c calculadora.cpp -o calculadora.o
+
+      - name: Compilar os 4 testes linkando o mesmo objeto instrumentado
+        run: |
+          g++ -std=c++17 --coverage teste_soma.cpp calculadora.o -o teste_soma
+          g++ -std=c++17 --coverage teste_subtracao.cpp calculadora.o -o teste_subtracao
+          g++ -std=c++17 --coverage teste_multiplicacao.cpp calculadora.o -o teste_multiplicacao
+          g++ -std=c++17 --coverage teste_divisao.cpp calculadora.o -o teste_divisao
+
+      - name: Rodar os 4 testes (acumulando cobertura)
+        run: |
+          ./teste_soma
+          ./teste_subtracao
+          ./teste_multiplicacao
+          ./teste_divisao
+
+      - name: Capturar dados de cobertura
+        run: |
+          lcov --capture --directory . --output-file coverage.info
+          lcov --extract coverage.info '*/calculadora.cpp' --output-file coverage_calculadora.info
+
+      - name: Gerar relatório HTML
+        run: genhtml coverage_calculadora.info --output-directory coverage_html
+
+      - name: Verificar percentual mínimo de cobertura (80%)
+        run: |
+          COVERAGE=$(lcov --summary coverage_calculadora.info | grep "lines" | grep -oP '\d+\.\d+(?=%)')
+          echo "Cobertura atual: $COVERAGE%"
+          if (( $(echo "$COVERAGE < 80" | bc -l) )); then
+            echo "Cobertura abaixo do mínimo exigido de 80%"
+            exit 1
+          fi
+
+      - name: Upload do relatório de cobertura
+        uses: actions/upload-artifact@v4
+        with:
+          name: relatorio-cobertura
+          path: coverage_html
+
   deploy:
     runs-on: ubuntu-latest
     needs: [teste_soma, teste_subtracao, teste_multiplicacao, teste_divisao]
