@@ -6,7 +6,7 @@ on:
       - main
 
 jobs:
-  teste_soma:
+  compilar:
     strategy:
       fail-fast: false
       matrix:
@@ -16,38 +16,116 @@ jobs:
     steps:
       - name: Checkout do código
         uses: actions/checkout@v4
+
+      - name: Instalar ccache (Ubuntu)
+        if: matrix.os == 'ubuntu-latest'
+        run: sudo apt-get update && sudo apt-get install -y ccache
+
+      - name: Instalar ccache (macOS)
+        if: matrix.os == 'macos-latest'
+        run: brew install ccache
+
+      - name: Instalar ccache (Windows)
+        if: matrix.os == 'windows-latest'
+        run: choco install ccache -y
+
+      - name: Cache do ccache
+        uses: actions/cache@v4
+        with:
+          path: ${{ matrix.os == 'windows-latest' && 'C:\Users\runneradmin\AppData\Local\ccache' || '~/.cache/ccache' }}
+          key: ccache-${{ matrix.os }}-cpp${{ matrix.cpp_std }}-${{ hashFiles('calculadora.cpp', 'calculadora.h') }}
+          restore-keys: |
+            ccache-${{ matrix.os }}-cpp${{ matrix.cpp_std }}-
+
+      - name: Compilar calculadora.o
+        run: ccache g++ -std=c++${{ matrix.cpp_std }} -c calculadora.cpp -o calculadora.o
+
+      - name: Estatísticas do ccache
+        run: ccache -s
+
+      - name: Upload do objeto compilado
+        uses: actions/upload-artifact@v4
+        with:
+          name: calculadora-${{ matrix.os }}-cpp${{ matrix.cpp_std }}
+          path: calculadora.o
+
+  teste_soma:
+    needs: compilar
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        cpp_std: [14, 17, 20]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+      - name: Baixar calculadora.o
+        uses: actions/download-artifact@v4
+        with:
+          name: calculadora-${{ matrix.os }}-cpp${{ matrix.cpp_std }}
       - name: Compilar teste de soma
-        run: g++ -std=c++${{ matrix.cpp_std }} -o teste_soma teste_soma.cpp calculadora.cpp
+        run: g++ -std=c++${{ matrix.cpp_std }} -o teste_soma teste_soma.cpp calculadora.o
       - name: Rodar teste de soma
         run: ./teste_soma
 
   teste_subtracao:
-    runs-on: ubuntu-latest
+    needs: compilar
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        cpp_std: [14, 17, 20]
+    runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout do código
         uses: actions/checkout@v4
+      - name: Baixar calculadora.o
+        uses: actions/download-artifact@v4
+        with:
+          name: calculadora-${{ matrix.os }}-cpp${{ matrix.cpp_std }}
       - name: Compilar teste de subtração
-        run: g++ -std=c++17 -o teste_subtracao teste_subtracao.cpp calculadora.cpp
+        run: g++ -std=c++${{ matrix.cpp_std }} -o teste_subtracao teste_subtracao.cpp calculadora.o
       - name: Rodar teste de subtração
         run: ./teste_subtracao
 
   teste_multiplicacao:
-    runs-on: ubuntu-latest
+    needs: compilar
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        cpp_std: [14, 17, 20]
+    runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout do código
         uses: actions/checkout@v4
+      - name: Baixar calculadora.o
+        uses: actions/download-artifact@v4
+        with:
+          name: calculadora-${{ matrix.os }}-cpp${{ matrix.cpp_std }}
       - name: Compilar teste de multiplicação
-        run: g++ -std=c++17 -o teste_multiplicacao teste_multiplicacao.cpp calculadora.cpp
+        run: g++ -std=c++${{ matrix.cpp_std }} -o teste_multiplicacao teste_multiplicacao.cpp calculadora.o
       - name: Rodar teste de multiplicação
         run: ./teste_multiplicacao
 
   teste_divisao:
-    runs-on: ubuntu-latest
+    needs: compilar
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        cpp_std: [14, 17, 20]
+    runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout do código
         uses: actions/checkout@v4
+      - name: Baixar calculadora.o
+        uses: actions/download-artifact@v4
+        with:
+          name: calculadora-${{ matrix.os }}-cpp${{ matrix.cpp_std }}
       - name: Compilar teste de divisão
-        run: g++ -std=c++17 -o teste_divisao teste_divisao.cpp calculadora.cpp
+        run: g++ -std=c++${{ matrix.cpp_std }} -o teste_divisao teste_divisao.cpp calculadora.o
       - name: Rodar teste de divisão
         run: ./teste_divisao
 
