@@ -8,14 +8,16 @@ on:
 jobs:
   teste_soma:
     strategy:
+      fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
+        cpp_std: [14, 17, 20]
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout do código
         uses: actions/checkout@v4
       - name: Compilar teste de soma
-        run: g++ -std=c++17 -o teste_soma teste_soma.cpp calculadora.cpp
+        run: g++ -std=c++${{ matrix.cpp_std }} -o teste_soma teste_soma.cpp calculadora.cpp
       - name: Rodar teste de soma
         run: ./teste_soma
 
